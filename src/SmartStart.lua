@@ -60,14 +60,14 @@ end
 -- Get the application from the applications list at the given index
 function SmartStart_Get_Application(applications, index)
 	local data = obs.obs_data_array_item(applications, index); -- Get the item from the array
-	local application = obs.obs_data_get_string(data, "value"):gsub("/", "\\"); -- Get the application path
+	local application = obs.obs_data_get_string(data, "value") -- Get the application path
 	
 	return application; -- Return the application path
 end
 
 -- Get the application infos (name and directory) from its path
 function SmartStart_Get_Application_Infos(applicationPath)
-	local index = applicationPath:match("^.*()\\"); -- Removing application name from path
+	local index = applicationPath:match("^.*()/"); -- Removing application name from path
 	local applicationDirectory = applicationPath:sub(1, index); -- Getting application directory from path
 	local applicationName = applicationPath:sub(index + 1, #applicationPath); -- Get the application name from the path	
 
