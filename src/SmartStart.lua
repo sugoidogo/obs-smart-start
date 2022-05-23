@@ -47,7 +47,7 @@ end
 function script_properties()
 	local properties = obs.obs_properties_create(); -- Create the obs properties
 
-	obs.obs_properties_add_editable_list(properties, "applications", "Applications to launch at OBS startup", obs.OBS_EDITABLE_LIST_TYPE_FILES, "*.exe", nil); -- Declare the applications list to launch at obs startup
+	obs.obs_properties_add_editable_list(properties, "applications", "Applications to launch at OBS startup", obs.OBS_EDITABLE_LIST_TYPE_FILES_AND_URLS, nil, nil); -- Declare the applications list to launch at obs startup
 	obs.obs_properties_add_button(properties, "startButton", "Start the applications", SmartStart_START); -- Declare a button to launch the script manually
 	obs.obs_properties_add_button(properties, "stopButton", "Stop all the applications currently running", SmartStart_STOP); -- Declare a button to launch the script manually
 	obs.obs_properties_add_bool(properties, "stopOnExit", "Stop all applications on exit ?"); -- Declare the auto exit of applications on obs exit
@@ -83,9 +83,18 @@ function SmartStart_START()
 		if length > 0 then -- If list is empty
 			for index = 0, length - 1 do -- For each application listed
 				local applicationPath = SmartStart_Get_Application(applications, index); -- Get the obs application from the list
-				local applicationName, applicationDirectory = SmartStart_Get_Application_Infos(applicationPath); -- Get the application infos (name and directory)
-
-				local command = 'start "" /d ' .. applicationDirectory .. ' ' .. '"' .. applicationName .. '" ' .. '/b /min'; -- Create the start command for the application
+				local command = ''
+				local home=os.getenv('HOME')
+				if text:find('/home', 1, true) == 1 then
+					command = 'xdg-open'
+				end
+				if text:find('/Users', 1, true) == 1 then
+					command = 'open'
+				end
+				if command == '' then
+					command = 'start'
+				end
+				command = command .. ' "' .. applicationPath .. '"'
 
 				os.execute(command); --Execute the application
 			end
